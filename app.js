@@ -29,9 +29,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res) => res.redirect('/category/list'));
 app.use('/category', categoryRouter);
 app.use('/item', itemRouter);
-app.use('/', (req, res) => res.redirect('/category/list'));
 
 app.use(function (req, res, next) {
   next(createError(404, 'Page Not Found'));
