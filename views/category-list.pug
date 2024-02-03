@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1= title
+
+  if categories.length
+    .card-wrapper
+      for category in categories
+        a.card(href=category.url)
+          h2= category.name
+          p.center
+            i ( #{category.itemCount} items )
+          p.center
+            if category.description
+              | #{category.description}
+            else
+              | No description provided for this category...
+  else
+    p.center
+      i There are no categories yet...
+
+  button(type="button", onclick="window.location.assign('/category/create')") New Category
