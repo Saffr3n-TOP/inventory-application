@@ -9,11 +9,100 @@
   padding: 0;
 }
 
+body {
+  padding: 0.5rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.logo {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: black;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+nav ul {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+}
+
+nav a {
+  color: black;
+  font-size: 1.2rem;
+}
+
+p.center {
+  text-align: center;
+}
+
+.card-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.5rem;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  padding: 0.5rem;
+  border: 1px solid black;
+  color: black;
+  transition: transform 0.2s linear;
+}
+
+.card:hover {
+  text-decoration: none;
+  transform: scale(1.025);
+}
+
+.card :last-child {
+  align-self: center;
+}
+
+button {
+  display: block;
+  margin: 0 auto;
+  margin-top: 0.5rem;
+  padding: 0.5rem 2rem;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: bold;
+  line-height: inherit;
 }
