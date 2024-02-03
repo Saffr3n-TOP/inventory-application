@@ -1,12 +1,15 @@
 import mongoose from 'mongoose';
 
-const ItemSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String, minLength: 1 },
-  category: { type: mongoose.Types.ObjectId, ref: 'Category' },
-  price: { type: Number, required: true },
-  stock: { type: Number, required: true }
-});
+const ItemSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String, minLength: 1 },
+    category: { type: mongoose.Types.ObjectId, ref: 'Category' },
+    price: { type: Number, required: true },
+    stock: { type: Number, required: true }
+  },
+  { collection: 'items' }
+);
 
 ItemSchema.virtual('url').get(function () {
   return `/item/${this.id}`;
