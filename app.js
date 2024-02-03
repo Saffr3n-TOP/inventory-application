@@ -8,6 +8,8 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 
 import indexRouter from './routes/index.js';
+import categoryRouter from './routes/category.js';
+import itemRouter from './routes/item.js';
 
 const app = express();
 
@@ -29,6 +31,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/category', categoryRouter);
+app.use('/item', itemRouter);
 
 app.use(function (req, res, next) {
   next(createError(404, 'Page Not Found'));
