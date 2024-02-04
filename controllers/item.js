@@ -101,7 +101,7 @@ export const itemCreatePost = [
       }
 
       return res.render('item-create', {
-        title: 'Create New Category',
+        title: 'Create New Product',
         categories,
         item,
         errors: validationErrors.array()
@@ -119,8 +119,27 @@ export const itemCreatePost = [
   }
 ];
 
-export function itemUpdateGet(req, res, next) {
-  res.send('NOT IMPLEMENTED: Item update GET');
+export async function itemUpdateGet(req, res, next) {
+  const [item, categories] = await Promise.all([
+    Item.findById(req.params.id).exec(),
+    Category.find().sort({ name: 1 }).exec()
+  ]).catch(() => []);
+
+  if (item === undefined) {
+    const err = createError(500, 'No Database Response');
+    return next(err);
+  }
+
+  if (item === null) {
+    const err = createError(404, 'Item Not Found');
+    return next(err);
+  }
+
+  res.render('item-create', {
+    title: `Update "${item.name}"`,
+    item,
+    categories
+  });
 }
 
 export function itemUpdatePost(req, res, next) {
