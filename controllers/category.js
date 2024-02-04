@@ -146,8 +146,27 @@ export const categoryUpdatePost = [
   }
 ];
 
-export function categoryDeleteGet(req, res, next) {
-  res.send('NOT IMPLEMENTED: Category delete GET');
+export async function categoryDeleteGet(req, res, next) {
+  const [category, items] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }).sort({ name: 1 }).exec()
+  ]).catch(() => []);
+
+  if (category === undefined) {
+    const err = createError(500, 'No Server Response');
+    return next(err);
+  }
+
+  if (category === null) {
+    const err = createError(404, 'Category Not Found');
+    return next(err);
+  }
+
+  res.render('category-delete', {
+    title: `Delete "${category.name}" category`,
+    category,
+    items
+  });
 }
 
 export function categoryDeletePost(req, res, next) {

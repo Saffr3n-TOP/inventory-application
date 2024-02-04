@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+
+  if items.length
+    p This category is not empty. Delete following items before proceeding:
+    ul
+      for item in items
+        li
+          a(href=item.url)= item.name
+  else
+    p.center This action is irreversible!
+    form(method="POST")
+      button(type="submit") Delete
