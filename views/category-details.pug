@@ -17,7 +17,7 @@ block content
               | #{item.description}
             else
               | No description provided for this item...
-          p.center.bold $#{item.price}
+          p.center.bold $#{item.priceFormatted}
   else
     p.center
       i There are no items in this category yet...

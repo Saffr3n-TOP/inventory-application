@@ -11,6 +11,10 @@ const ItemSchema = new mongoose.Schema(
   { collection: 'items' }
 );
 
+ItemSchema.virtual('priceFormatted').get(function () {
+  return this.price.toFixed(2);
+});
+
 ItemSchema.virtual('url').get(function () {
   return `/item/${this.id}`;
 });
