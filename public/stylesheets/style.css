@@ -120,6 +120,15 @@ p.bold {
   background-color: gray;
 }
 
+.image {
+  display: block;
+  width: 10rem;
+  height: 10rem;
+  margin: 0 auto;
+  margin-bottom: 0.5rem;
+  background-color: gray;
+}
+
 button {
   display: block;
   margin: 0 auto;

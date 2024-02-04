@@ -18,8 +18,21 @@ export async function itemList(req, res, next) {
   });
 }
 
-export function itemDetails(req, res, next) {
-  res.send('NOT IMPLEMENTED: Item details');
+export async function itemDetails(req, res, next) {
+  const item = await Item.findById(req.params.id)
+    .populate('category')
+    .exec()
+    .catch(() => {});
+
+  if (!item) {
+    const err = createError(500, 'No Database Response');
+    return next(err);
+  }
+
+  res.render('item-details', {
+    title: item.name,
+    item
+  });
 }
 
 export function itemCreateGet(req, res, next) {
