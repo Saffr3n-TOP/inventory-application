@@ -20,3 +20,6 @@ block content
       | No description provided for this item...
 
   p.center.bold $#{item.priceFormatted}
+
+  button(type="button" onclick=`window.location.assign('${item.url}/update')`) Update
+  button(type="button" onclick=`window.location.assign('${item.url}/delete')`) Delete
