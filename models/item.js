@@ -3,10 +3,14 @@ import mongoose from 'mongoose';
 const ItemSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    description: { type: String, minLength: 1 },
-    category: { type: mongoose.Types.ObjectId, ref: 'Category' },
-    price: { type: Number, required: true },
-    stock: { type: Number, required: true }
+    description: String,
+    category: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Category',
+      required: true
+    },
+    price: { type: Number, min: 0, required: true },
+    stock: { type: Number, min: 0, required: true }
   },
   { collection: 'items' }
 );
