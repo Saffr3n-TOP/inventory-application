@@ -169,6 +169,20 @@ export async function categoryDeleteGet(req, res, next) {
   });
 }
 
-export function categoryDeletePost(req, res, next) {
-  res.send('NOT IMPLEMENTED: Category delete POST');
+export async function categoryDeletePost(req, res, next) {
+  const category = await Category.findByIdAndDelete(req.params.id)
+    .exec()
+    .catch(() => {});
+
+  if (category === undefined) {
+    const err = createError(500, 'No Server Response');
+    return next(err);
+  }
+
+  if (category === null) {
+    const err = createError(404, 'Category Not Found');
+    return next(err);
+  }
+
+  res.redirect('/category/list');
 }
