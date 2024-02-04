@@ -9,10 +9,13 @@ block content
     label(for="description") Description
       textarea#description(name="description")= (item ? item.description : '')
     label(for="category") Category
-      select#category(name="category" required value=(item ? item.category : ''))
+      select#category(name="category" required)
         option(value="") --Select a category--
         for category in categories
-          option(value=category.id)= category.name
+          if item && item.category.toString() === category.id
+            option(value=category.id selected)= category.name
+          else
+            option(value=category.id)= category.name
     label(for="price") Price
       input#price(type="number" name="price" required value=(item ? item.price : ''))
     label(for="stock") Quantity

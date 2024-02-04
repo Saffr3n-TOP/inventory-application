@@ -1,4 +1,5 @@
 import createError from 'http-errors';
+import { body, validationResult } from 'express-validator';
 import Item from '../models/item.js';
 import Category from '../models/category.js';
 
@@ -55,9 +56,68 @@ export async function itemCreateGet(req, res, next) {
   res.render('item-create', { title: 'Create New Product', categories });
 }
 
-export function itemCreatePost(req, res, next) {
-  res.send('NOT IMPLEMENTED: Item create POST');
-}
+export const itemCreatePost = [
+  body('name', 'Product name is required').trim().notEmpty().escape(),
+  body('description').trim().escape(),
+  body('category', 'Category is required').trim().notEmpty().escape(),
+  body('price')
+    .trim()
+    .notEmpty()
+    .withMessage('Price is required')
+    .escape()
+    .isNumeric()
+    .toFloat()
+    .isFloat({ min: 0 })
+    .withMessage('Price must be a non-negative number'),
+  body('stock')
+    .trim()
+    .notEmpty()
+    .withMessage('Quantity is required')
+    .escape()
+    .isNumeric()
+    .toInt()
+    .isInt({ min: 0 })
+    .withMessage('Quantity must be a non-negative number'),
+
+  async function (req, res, next) {
+    const validationErrors = validationResult(req);
+    const item = new Item({
+      name: req.body.name,
+      description: req.body.description,
+      category: req.body.category,
+      price: req.body.price,
+      stock: req.body.stock
+    });
+
+    if (!validationErrors.isEmpty()) {
+      const categories = await Category.find()
+        .sort({ name: 1 })
+        .exec()
+        .catch(() => {});
+
+      if (!categories) {
+        const err = createError(500, 'No Database Response');
+        return next(err);
+      }
+
+      return res.render('item-create', {
+        title: 'Create New Category',
+        categories,
+        item,
+        errors: validationErrors.array()
+      });
+    }
+
+    const saved = await item.save().catch(() => {});
+
+    if (!saved) {
+      const err = createError(500, 'No Database Response');
+      return next(err);
+    }
+
+    res.redirect(item.url);
+  }
+];
 
 export function itemUpdateGet(req, res, next) {
   res.send('NOT IMPLEMENTED: Item update GET');
