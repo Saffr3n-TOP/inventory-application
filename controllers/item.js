@@ -24,8 +24,13 @@ export async function itemDetails(req, res, next) {
     .exec()
     .catch(() => {});
 
-  if (!item) {
+  if (item === undefined) {
     const err = createError(500, 'No Database Response');
+    return next(err);
+  }
+
+  if (item === null) {
+    const err = createError(404, 'Item Not Found');
     return next(err);
   }
 

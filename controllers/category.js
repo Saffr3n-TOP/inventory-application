@@ -40,8 +40,13 @@ export async function categoryDetails(req, res, next) {
     Item.find({ category: req.params.id }).sort({ name: 1 }).exec()
   ]).catch(() => []);
 
-  if (!category) {
+  if (category === undefined) {
     const err = createError(500, 'No Database Response');
+    return next(err);
+  }
+
+  if (category === null) {
+    const err = createError(404, 'Category Not Found');
     return next(err);
   }
 
