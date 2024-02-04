@@ -12,7 +12,9 @@ const ItemSchema = new mongoose.Schema(
 );
 
 ItemSchema.virtual('priceFormatted').get(function () {
-  return this.price.toFixed(2);
+  return this.price % Math.floor(this.price) !== 0
+    ? this.price.toFixed(2)
+    : this.price;
 });
 
 ItemSchema.virtual('url').get(function () {
