@@ -113,9 +113,38 @@ export async function categoryUpdateGet(req, res, next) {
   });
 }
 
-export function categoryUpdatePost(req, res, next) {
-  res.send('NOT IMPLEMENTED: Category update POST');
-}
+export const categoryUpdatePost = [
+  body('name', 'Category name is required').trim().notEmpty().escape(),
+  body('description').trim().escape(),
+
+  async function (req, res, next) {
+    const validationErrors = validationResult(req);
+    const category = new Category({
+      name: req.body.name,
+      description: req.body.description,
+      _id: req.params.id
+    });
+
+    if (!validationErrors.isEmpty()) {
+      return res.render('category-create', {
+        title: `Update "${category.name}" Category`,
+        category,
+        errors: validationErrors.array()
+      });
+    }
+
+    const saved = await Category.findByIdAndUpdate(req.params.id, category)
+      .exec()
+      .catch(() => {});
+
+    if (!saved) {
+      const err = createError(500, 'No Database Response');
+      return next(err);
+    }
+
+    res.redirect(category.url);
+  }
+];
 
 export function categoryDeleteGet(req, res, next) {
   res.send('NOT IMPLEMENTED: Category delete GET');
