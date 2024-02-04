@@ -8,7 +8,7 @@ block content
       input#name(type="text" name="name" required value=(category ? category.name : ''))
     label(for="description") Description
       textarea#description(name="description")= (category ? category.description : '')
-    button(type="submit") Create
+    button(type="submit") Save
 
   if errors
     h2(style="text-align: start") Errors

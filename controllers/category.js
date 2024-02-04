@@ -92,8 +92,25 @@ export const categoryCreatePost = [
   }
 ];
 
-export function categoryUpdateGet(req, res, next) {
-  res.send('NOT IMPLEMENTED: Category update GET');
+export async function categoryUpdateGet(req, res, next) {
+  const category = await Category.findById(req.params.id)
+    .exec()
+    .catch(() => {});
+
+  if (category === undefined) {
+    const err = createError(500, 'No Database Response');
+    return next(err);
+  }
+
+  if (category === null) {
+    const err = createError(404, 'Category Not Found');
+    return next(err);
+  }
+
+  res.render('category-create', {
+    title: `Update "${category.name}" Category`,
+    category
+  });
 }
 
 export function categoryUpdatePost(req, res, next) {
