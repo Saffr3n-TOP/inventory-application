@@ -1,4 +1,5 @@
 import createError from 'http-errors';
+import { body, validationResult } from 'express-validator';
 import Category from '../models/category.js';
 import Item from '../models/item.js';
 
@@ -61,9 +62,35 @@ export function categoryCreateGet(req, res, next) {
   res.render('category-create', { title: 'Create New Category' });
 }
 
-export function categoryCreatePost(req, res, next) {
-  res.send('NOT IMPLEMENTED: Category create POST');
-}
+export const categoryCreatePost = [
+  body('name', 'Category name is required').trim().notEmpty().escape(),
+  body('description').trim().escape(),
+
+  async function (req, res, next) {
+    const validationErrors = validationResult(req);
+    const category = new Category({
+      name: req.body.name,
+      description: req.body.description
+    });
+
+    if (!validationErrors.isEmpty()) {
+      return res.render('category-create', {
+        title: 'Create New Category',
+        category,
+        errors: validationErrors.array()
+      });
+    }
+
+    const saved = await category.save().catch(() => {});
+
+    if (!saved) {
+      const err = createError(500, 'No Database Response');
+      return next(err);
+    }
+
+    res.redirect(category.url);
+  }
+];
 
 export function categoryUpdateGet(req, res, next) {
   res.send('NOT IMPLEMENTED: Category update GET');

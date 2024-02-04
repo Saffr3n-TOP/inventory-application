@@ -5,7 +5,13 @@ block content
 
   form(method="POST")
     label(for="name") Name
-      input#name(type="text" name="name" required)
+      input#name(type="text" name="name" required value=(category ? category.name : ''))
     label(for="description") Description
-      textarea#description(name="description")
+      textarea#description(name="description")= (category ? category.description : '')
     button(type="submit") Create
+
+  if errors
+    h2(style="text-align: start") Errors
+    ul
+      for error in errors
+        li= error.msg
