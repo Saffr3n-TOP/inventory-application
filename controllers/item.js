@@ -1,5 +1,21 @@
-export function itemList(req, res, next) {
-  res.send('NOT IMPLEMENTED: Item list');
+import createError from 'http-errors';
+import Item from '../models/item.js';
+
+export async function itemList(req, res, next) {
+  const items = await Item.find()
+    .sort({ category: 1, name: 1 })
+    .exec()
+    .catch(() => {});
+
+  if (!items) {
+    const err = createError(500, 'No Database Response');
+    return next(err);
+  }
+
+  res.render('item-list', {
+    title: 'All Products',
+    items
+  });
 }
 
 export function itemDetails(req, res, next) {

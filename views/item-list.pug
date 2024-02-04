@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h1= title
+
+  if items.length
+    .card-wrapper.wide
+      for item in items
+        a.card(href=item.url)
+          h2= item.name
+          .card-image
+          p.center
+            i ( In stock: #{item.stock} )
+          p.center
+            if item.description
+              | #{item.description}
+            else
+              | No description provided for this item...
+          p.center.bold $#{item.priceFormatted}
+  else
+    p.center
+      i There are no products yet...
+
+  button(type="button", onclick="window.location.assign('/item/create')") New Product
