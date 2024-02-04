@@ -208,8 +208,23 @@ export const itemUpdatePost = [
   }
 ];
 
-export function itemDeleteGet(req, res, next) {
-  res.send('NOT IMPLEMENTED: Item delete GET');
+export async function itemDeleteGet(req, res, next) {
+  const item = await Item.findById(req.params.id).exec();
+
+  if (item === undefined) {
+    const err = createError(500, 'No Server Response');
+    return next(err);
+  }
+
+  if (item === null) {
+    const err = createError(404, 'Item Not Found');
+    return next(err);
+  }
+
+  res.render('item-delete', {
+    title: `Delete "${item.name}"`,
+    item
+  });
 }
 
 export function itemDeletePost(req, res, next) {
