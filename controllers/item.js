@@ -209,7 +209,9 @@ export const itemUpdatePost = [
 ];
 
 export async function itemDeleteGet(req, res, next) {
-  const item = await Item.findById(req.params.id).exec();
+  const item = await Item.findById(req.params.id)
+    .exec()
+    .catch(() => {});
 
   if (item === undefined) {
     const err = createError(500, 'No Server Response');
@@ -227,6 +229,20 @@ export async function itemDeleteGet(req, res, next) {
   });
 }
 
-export function itemDeletePost(req, res, next) {
-  res.send('NOT IMPLEMENTED: Item delete POST');
+export async function itemDeletePost(req, res, next) {
+  const item = await Item.findByIdAndDelete(req.params.id)
+    .exec()
+    .catch(() => {});
+
+  if (item === undefined) {
+    const err = createError(500, 'No Server Response');
+    return next(err);
+  }
+
+  if (item === null) {
+    const err = createError(404, 'Item Not Found');
+    return next(err);
+  }
+
+  res.redirect('/item/list');
 }
