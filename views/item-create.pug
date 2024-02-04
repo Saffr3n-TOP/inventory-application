@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  h1= title
+
+  form(method="POST")
+    label(for="name") Name
+      input#name(type="text" name="name" required value=(item ? item.name : ''))
+    label(for="description") Description
+      textarea#description(name="description")= (item ? item.description : '')
+    label(for="category") Category
+      select#category(name="category" required value=(item ? item.category : ''))
+        option(value="") --Select a category--
+        for category in categories
+          option(value=category.id)= category.name
+    label(for="price") Price
+      input#price(type="number" name="price" required value=(item ? item.price : ''))
+    label(for="stock") Quantity
+      input#stock(type="number" name="stock" required value=(item ? item.stock : 0))
+    button(type="submit") Save
+
+  if errors
+    h2(style="text-align: start") Errors
+    ul
+      for error in errors
+        li= error.msg

@@ -1,5 +1,6 @@
 import createError from 'http-errors';
 import Item from '../models/item.js';
+import Category from '../models/category.js';
 
 export async function itemList(req, res, next) {
   const items = await Item.find()
@@ -40,8 +41,18 @@ export async function itemDetails(req, res, next) {
   });
 }
 
-export function itemCreateGet(req, res, next) {
-  res.send('NOT IMPLEMENTED: Item create GET');
+export async function itemCreateGet(req, res, next) {
+  const categories = await Category.find()
+    .sort({ name: 1 })
+    .exec()
+    .catch(() => {});
+
+  if (!categories) {
+    const err = createError(500, 'No Database Response');
+    return next(err);
+  }
+
+  res.render('item-create', { title: 'Create New Product', categories });
 }
 
 export function itemCreatePost(req, res, next) {
