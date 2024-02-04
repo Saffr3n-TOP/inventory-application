@@ -68,8 +68,16 @@ nav a {
   font-size: 1.2rem;
 }
 
+p:not(:last-child) {
+  margin-bottom: 0.5rem;
+}
+
 p.center {
   text-align: center;
+}
+
+p.bold {
+  font-weight: bold;
 }
 
 .card-wrapper {
@@ -78,13 +86,22 @@ p.center {
   gap: 0.5rem;
 }
 
+.card-wrapper.wide {
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+}
+
 .card {
   display: grid;
   grid-template-rows: auto auto 1fr;
+  gap: 0.5rem;
   padding: 0.5rem;
   border: 1px solid black;
   color: black;
   transition: transform 0.2s linear;
+}
+
+.card-wrapper.wide .card {
+  grid-template-rows: repeat(5, auto);
 }
 
 .card:hover {
@@ -94,6 +111,13 @@ p.center {
 
 .card :last-child {
   align-self: center;
+}
+
+.card-image {
+  justify-self: center;
+  width: 10rem;
+  height: 10rem;
+  background-color: gray;
 }
 
 button {

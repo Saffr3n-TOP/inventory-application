@@ -34,8 +34,22 @@ export async function categoryList(req, res, next) {
   });
 }
 
-export function categoryDetails(req, res, next) {
-  res.send('NOT IMPLEMENTED: Category details');
+export async function categoryDetails(req, res, next) {
+  const [category, items] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }).sort({ name: 1 }).exec()
+  ]).catch(() => []);
+
+  if (!category) {
+    const err = createError(500, 'No Database Response');
+    return next(err);
+  }
+
+  res.render('category-details', {
+    title: category.name,
+    category,
+    items
+  });
 }
 
 export function categoryCreateGet(req, res, next) {

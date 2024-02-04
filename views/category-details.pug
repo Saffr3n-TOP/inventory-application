@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  h1= title
+  p.center= category.description
+
+  if items.length
+    .card-wrapper.wide
+      for item in items
+        a.card(href=item.url)
+          h2= item.name
+          .card-image
+          p.center
+            i ( In stock: #{item.stock} )
+          p.center
+            if item.description
+              | #{item.description}
+            else
+              | No description provided for this item...
+          p.center.bold $#{item.price}
+  else
+    p.center
+      i There are no items in this category yet...
