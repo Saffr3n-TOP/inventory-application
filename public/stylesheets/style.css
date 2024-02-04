@@ -129,6 +129,15 @@ p.bold {
   background-color: gray;
 }
 
+form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+label {
+  display: grid;
+}
+
 button {
   display: block;
   margin: 0 auto;

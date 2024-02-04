@@ -58,7 +58,7 @@ export async function categoryDetails(req, res, next) {
 }
 
 export function categoryCreateGet(req, res, next) {
-  res.send('NOT IMPLEMENTED: Category create GET');
+  res.render('category-create', { title: 'Create New Category' });
 }
 
 export function categoryCreatePost(req, res, next) {
