@@ -111,7 +111,7 @@ p.bold {
 
 .card:hover {
   text-decoration: none;
-  transform: scale(1.025);
+  transform: scale(1.005);
 }
 
 .card :last-child {
