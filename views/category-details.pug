@@ -26,6 +26,7 @@ block content
     p.center
       i There are no items in this category yet...
 
-  button(type="button" onclick=`window.location.assign('${category.url}/update')`) Update
-  button(type="button" onclick=`window.location.assign('${category.url}/delete')`) Delete
+  button#update(type="button") Update
+  button#delete(type="button") Delete
   
+  script(src="../javascripts/details.js")
