@@ -1,7 +1,28 @@
 import createError from 'http-errors';
 import { body, validationResult } from 'express-validator';
+import multer from 'multer';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 import Item from '../models/item.js';
 import Category from '../models/category.js';
+
+const upload = multer({
+  dest: 'public/images/',
+  limits: { fileSize: 1000000 },
+  fileFilter: (req, file, cb) => {
+    const allowedExtensions = /jpe?g|png/;
+    const correctMimeType = allowedExtensions.test(file.mimetype);
+    const correctExtension = allowedExtensions.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+
+    if (!correctMimeType || !correctExtension) {
+      return cb(null, false);
+    }
+
+    cb(null, true);
+  }
+}).single('image');
 
 export async function itemList(req, res, next) {
   const items = await Item.find()
@@ -57,6 +78,15 @@ export async function itemCreateGet(req, res, next) {
 }
 
 export const itemCreatePost = [
+  function (req, res, next) {
+    upload(req, res, (err) => {
+      if (err) {
+        req.body.image = null;
+      }
+      next();
+    });
+  },
+
   body('name', 'Product name is required').trim().notEmpty().escape(),
   body('description').trim().escape(),
   body('category', 'Category is required').trim().notEmpty().escape(),
@@ -78,6 +108,10 @@ export const itemCreatePost = [
     .toInt()
     .isInt({ min: 0 })
     .withMessage('Quantity must be a non-negative number'),
+  body(
+    'image',
+    'Only jpg, jpeg and png files up to 1MB are allowed for image'
+  ).custom((image) => image === undefined),
 
   async function (req, res, next) {
     const validationErrors = validationResult(req);
@@ -88,6 +122,7 @@ export const itemCreatePost = [
       price: req.body.price,
       stock: req.body.stock
     });
+    if (req.file) item.image = `/images/${req.file.filename}`;
 
     if (!validationErrors.isEmpty()) {
       const categories = await Category.find()
@@ -143,6 +178,15 @@ export async function itemUpdateGet(req, res, next) {
 }
 
 export const itemUpdatePost = [
+  function (req, res, next) {
+    upload(req, res, (err) => {
+      if (err) {
+        req.body.image = null;
+      }
+      next();
+    });
+  },
+
   body('name', 'Product name is required').trim().notEmpty().escape(),
   body('description').trim().escape(),
   body('category', 'Category is required').trim().notEmpty().escape(),
@@ -164,17 +208,43 @@ export const itemUpdatePost = [
     .toInt()
     .isInt({ min: 0 })
     .withMessage('Quantity must be a non-negative number'),
+  body(
+    'image',
+    'Only jpg, jpeg and png files up to 1MB are allowed for image'
+  ).custom((image) => image === undefined),
 
   async function (req, res, next) {
     const validationErrors = validationResult(req);
-    const item = new Item({
-      name: req.body.name,
-      description: req.body.description,
-      category: req.body.category,
-      price: req.body.price,
-      stock: req.body.stock,
-      _id: req.params.id
-    });
+    const item = await Item.findById(req.params.id)
+      .exec()
+      .catch(() => {});
+
+    if (!item) {
+      const err = createError(500, 'No Database Response');
+      return next(err);
+    }
+
+    item.name = req.body.name;
+    item.description = req.body.description;
+    item.category = req.body.category;
+    item.price = req.body.price;
+    item.stock = req.body.stock;
+
+    if (req.file) {
+      if (item.image) {
+        const oldImage = item.image.split('/images/')[1];
+        const deleted = await fs
+          .unlink(`public/images/${oldImage}`)
+          .catch(() => null);
+
+        if (deleted === null) {
+          const err = createError(500, 'Unknown Error');
+          return next(err);
+        }
+      }
+
+      item.image = `/images/${req.file.filename}`;
+    }
 
     if (!validationErrors.isEmpty()) {
       const categories = await Category.find()
@@ -242,6 +312,18 @@ export async function itemDeletePost(req, res, next) {
   if (item === null) {
     const err = createError(404, 'Item Not Found');
     return next(err);
+  }
+
+  if (item.image) {
+    const oldImage = item.image.split('/images/')[1];
+    const deleted = await fs
+      .unlink(`public/images/${oldImage}`)
+      .catch(() => null);
+
+    if (deleted === null) {
+      const err = createError(500, 'Unknown Error');
+      return next(err);
+    }
   }
 
   res.redirect('/item/list');

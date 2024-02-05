@@ -10,7 +10,8 @@ const ItemSchema = new mongoose.Schema(
       required: true
     },
     price: { type: Number, min: 0, required: true },
-    stock: { type: Number, min: 0, required: true }
+    stock: { type: Number, min: 0, required: true },
+    image: String
   },
   { collection: 'items' }
 );

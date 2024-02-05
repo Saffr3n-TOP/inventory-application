@@ -1,21 +1,25 @@
 extends layout
 
 block content
-  h1= title
+  h1!= title
 
-  .image
+  if item.image
+    img(src=item.image, alt="")
+  else
+    .image
+      span Image Placeholder
 
   p.center
     i ( In stock: #{item.stock} )
 
   p.center
     i ( Category: 
-      a(href=item.category.url)= item.category.name
+      a(href=item.category.url)!= item.category.name
       |  )
 
   p.center
     if item.description
-      | #{item.description}
+      | !{item.description}
     else
       | No description provided for this item...
 

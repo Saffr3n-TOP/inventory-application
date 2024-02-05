@@ -3,7 +3,7 @@ extends layout
 block content
   h1= title
 
-  form(method="POST")
+  form(method="POST" enctype="multipart/form-data")
     label(for="name") Name
       input#name(type="text" name="name" required value=(item ? item.name : ''))
     label(for="description") Description
@@ -20,6 +20,8 @@ block content
       input#price(type="number" name="price" required value=(item ? item.price : ''))
     label(for="stock") Quantity
       input#stock(type="number" name="stock" required value=(item ? item.stock : 0))
+    label(for="image") Image
+      input#image(type="file" name="image")
     button(type="submit") Save
 
   if errors
