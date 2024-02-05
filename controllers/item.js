@@ -173,7 +173,8 @@ export async function itemUpdateGet(req, res, next) {
   res.render('item-create', {
     title: `Update "${item.name}"`,
     item,
-    categories
+    categories,
+    protected: true
   });
 }
 
@@ -212,6 +213,12 @@ export const itemUpdatePost = [
     'image',
     'Only jpg, jpeg and png files up to 1MB are allowed for image'
   ).custom((image) => image === undefined),
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('Password is required')
+    .matches(process.env.ADMIN_PASSWORD)
+    .withMessage('Incorrect Password'),
 
   async function (req, res, next) {
     const validationErrors = validationResult(req);
@@ -261,7 +268,8 @@ export const itemUpdatePost = [
         title: `Update "${item.name}"`,
         item,
         categories,
-        errors: validationErrors.array()
+        errors: validationErrors.array(),
+        protected: true
       });
     }
 
@@ -299,32 +307,60 @@ export async function itemDeleteGet(req, res, next) {
   });
 }
 
-export async function itemDeletePost(req, res, next) {
-  const item = await Item.findByIdAndDelete(req.params.id)
-    .exec()
-    .catch(() => {});
+export const itemDeletePost = [
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('Password is required')
+    .matches(process.env.ADMIN_PASSWORD)
+    .withMessage('Incorrect Password'),
 
-  if (item === undefined) {
-    const err = createError(500, 'No Server Response');
-    return next(err);
-  }
+  async function (req, res, next) {
+    const validationErrors = validationResult(req);
+    const item = await Item.findById(req.params.id)
+      .exec()
+      .catch(() => {});
 
-  if (item === null) {
-    const err = createError(404, 'Item Not Found');
-    return next(err);
-  }
-
-  if (item.image) {
-    const oldImage = item.image.split('/images/')[1];
-    const deleted = await fs
-      .unlink(`public/images/${oldImage}`)
-      .catch(() => null);
-
-    if (deleted === null) {
-      const err = createError(500, 'Unknown Error');
+    if (item === undefined) {
+      const err = createError(500, 'No Server Response');
       return next(err);
     }
-  }
 
-  res.redirect('/item/list');
-}
+    if (item === null) {
+      const err = createError(404, 'Item Not Found');
+      return next(err);
+    }
+
+    if (!validationErrors.isEmpty()) {
+      return res.render('item-delete', {
+        title: `Delete "${item.name}"`,
+        item,
+        errors: validationErrors.array()
+      });
+    }
+
+    if (item.image) {
+      const oldImage = item.image.split('/images/')[1];
+      const deleted = await fs
+        .unlink(`public/images/${oldImage}`)
+        .catch(() => null);
+
+      if (deleted === null) {
+        const err = createError(500, 'Unknown Error');
+        return next(err);
+      }
+    }
+
+    const deleted = await item
+      .deleteOne()
+      .exec()
+      .catch(() => {});
+
+    if (!deleted) {
+      const err = createError(500, 'No Database Response');
+      return next(err);
+    }
+
+    res.redirect('/item/list');
+  }
+];

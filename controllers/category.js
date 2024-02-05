@@ -109,13 +109,20 @@ export async function categoryUpdateGet(req, res, next) {
 
   res.render('category-create', {
     title: `Update "${category.name}" Category`,
-    category
+    category,
+    protected: true
   });
 }
 
 export const categoryUpdatePost = [
   body('name', 'Category name is required').trim().notEmpty().escape(),
   body('description').trim().escape(),
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('Password is required')
+    .matches(process.env.ADMIN_PASSWORD)
+    .withMessage('Incorrect Password'),
 
   async function (req, res, next) {
     const validationErrors = validationResult(req);
@@ -129,7 +136,8 @@ export const categoryUpdatePost = [
       return res.render('category-create', {
         title: `Update "${category.name}" Category`,
         category,
-        errors: validationErrors.array()
+        errors: validationErrors.array(),
+        protected: true
       });
     }
 
@@ -169,20 +177,59 @@ export async function categoryDeleteGet(req, res, next) {
   });
 }
 
-export async function categoryDeletePost(req, res, next) {
-  const category = await Category.findByIdAndDelete(req.params.id)
-    .exec()
-    .catch(() => {});
+export const categoryDeletePost = [
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('Password is required')
+    .matches(process.env.ADMIN_PASSWORD)
+    .withMessage('Incorrect Password'),
 
-  if (category === undefined) {
-    const err = createError(500, 'No Server Response');
-    return next(err);
+  async function (req, res, next) {
+    const validationErrors = validationResult(req);
+    const category = await Category.findById(req.params.id)
+      .exec()
+      .catch(() => {});
+
+    if (category === undefined) {
+      const err = createError(500, 'No Server Response');
+      return next(err);
+    }
+
+    if (category === null) {
+      const err = createError(404, 'Category Not Found');
+      return next(err);
+    }
+
+    if (!validationErrors.isEmpty()) {
+      const items = await Item.find({ category: req.params.id })
+        .sort({ name: 1 })
+        .exec()
+        .catch(() => {});
+
+      if (!items) {
+        const err = createError(500, 'No Server Response');
+        return next(err);
+      }
+
+      return res.render('category-delete', {
+        title: `Delete "${category.name}" category`,
+        category,
+        items,
+        errors: validationErrors.array()
+      });
+    }
+
+    const deleted = await category
+      .deleteOne()
+      .exec()
+      .catch(() => {});
+
+    if (!deleted) {
+      const err = createError(500, 'No Database Response');
+      return next(err);
+    }
+
+    res.redirect('/category/list');
   }
-
-  if (category === null) {
-    const err = createError(404, 'Category Not Found');
-    return next(err);
-  }
-
-  res.redirect('/category/list');
-}
+];

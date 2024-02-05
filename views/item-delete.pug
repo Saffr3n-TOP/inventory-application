@@ -4,4 +4,12 @@ block content
   h1= title
   p.center This action is irreversible!
   form(method="POST")
+    label(for="password") Password
+        input#password(type="password" name="password" required)
     button(type="submit") Delete
+
+  if errors
+    h2(style="text-align: start") Errors
+    ul
+      for error in errors
+        li= error.msg
